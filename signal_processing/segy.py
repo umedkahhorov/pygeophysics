@@ -244,3 +244,49 @@ def read_model(filename):
         data = segyfile.trace.raw[:]
     data = np.squeeze(data)
     return data
+##5
+def read_vsp_segy(filename):
+    """
+    Reads VSP SEGY file using segyio library and returns data matrix with shape (n_samples, n_traces)
+    Parameters
+    ----------
+    filename : str
+        path to the VSP SEGY file
+    Returns:
+    --------
+    np.ndarray
+        A 1-dimensional NumPy array of floats.
+    """
+    with segyio.open(filename, ignore_geometry=True) as f:
+        n_traces = f.tracecount
+        sample_rate = segyio.tools.dt(f) / 1000
+        n_samples = f.samples.size
+        twt = f.samples
+        print("Total number of traces",n_traces)
+        print("Sample rate",sample_rate)
+        print("Number of samples",n_samples)
+        f.mmap()
+        data = f.trace.raw[:]
+        return data
+##5
+def read_vsp_segy(filename,bites=[73,77,81,85],hdr=True):
+    with segyio.open(filename, ignore_geometry=True) as f:
+        n_traces = f.tracecount
+        sample_rate = segyio.tools.dt(f) / 1000
+        n_samples = f.samples.size
+        twt = f.samples
+        print(n_traces,twt.shape,n_samples,sample_rate)
+        f.mmap()
+        data = f.trace.raw[:]
+        df = pd.DataFrame()
+        for bite in bites:
+            header_keys = segyio.tracefield.keys
+            header_name = [k for k, v in header_keys.items() if v == bite]
+            segy_header = getattr(segyio.TraceField, header_name[0])
+            headers = f.attributes(segy_header)[:]
+            df[header_name[0]] = headers
+        if hdr:
+            return data,df
+        else:
+            return data
+    
