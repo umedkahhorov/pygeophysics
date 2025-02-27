@@ -289,4 +289,22 @@ def read_vsp_segy(filename,bites=[73,77,81,85],hdr=True):
             return data,df
         else:
             return data
-    
+##6
+def parse_text_header(segyfile):
+    '''
+    Format segy text header into a readable, clean dict
+    '''
+    raw_header = segyio.tools.wrap(segyfile.text[0])
+    # Cut on C*int pattern
+    cut_header = re.split(r'C ', raw_header)[1::]
+    # Remove end of line return
+    text_header = [x.replace('\n', ' ') for x in cut_header]
+    text_header[-1] = text_header[-1][:-2]
+    # Format in dict
+    clean_header = {}
+    i = 1
+    for item in text_header:
+        key = "C" + str(i).rjust(2, '0')
+        i += 1
+        clean_header[key] = item
+    return clean_header
