@@ -1,3 +1,7 @@
+# example of usage
+#d2 = dataH1[:,r1:r2] - extract 2D array gather - shot gather
+#refpicks2 =  calculate_refpicks(d2, sta_window=20, lta_window=400, dt=0.01)
+
 # define feature functions
 def classic_sta_lta_py(a, nsta, nlta):
     """
